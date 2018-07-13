@@ -4,15 +4,15 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Indicadores Intercambio</title>
+	<title>Fomento Productivo</title>
 	<link rel="stylesheet" href="../../css/bootstrap.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../../css/estilos.css">
 </head>
 <body>
-	<?php 
+	<?php	
 	include('../../lib/dbconfig.php');					// conexion a base de datos	
-	 ?>
+ 	?>
 	<div class="container-fluid">
 		<nav class="navbar navbar-inverse">
 			<div class="container">				
@@ -26,7 +26,7 @@
 							<option value="0" selected> TODOS </option>
 							<?php
 							$anio = date('Y');
-							$departamento = 'IM';							
+							$departamento = 'FP';							
 							$sqlIndicadores = "select cod_indicador, indicador from indicador where estado = 1 and departamento = '" . $departamento . "' and anio_inicio <= " . $anio . " and anio_fin >= " . $anio;
 							$resIndicadores = query($sqlIndicadores);
 							$arrayIndicadores = array();
@@ -98,17 +98,17 @@
 		<!-- <div id="progress" class="progress">
 			<div id="barraProgreso" class="progress-bar myBar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 5%;">5%</div>
 		</div> -->
-		<div class="row">
+		<!-- <div class="row">
 			<div class="col-sm-12 controlConsolidado text-center">
 				<select class="opcionConsolidado" id="opcionConsolidado">
 					<option value="0">-- ELIJA UNA OPCIÓN --</option>					
 					<?php
-					$sqlOpcionesReporteConsolidado = "select * from catalogo where significado_direccion = 'IM' and codigo = 'reporte_consolidado'";
-					$resOpcionesReporteConsolidado = query($sqlOpcionesReporteConsolidado);
-					while($filaOpcionesConsolidado = mysql_fetch_array($resOpcionesReporteConsolidado))
-					{
-						echo '<option value="' . $filaOpcionesConsolidado['cod_catalogo'] . '">' . $filaOpcionesConsolidado['valor'] . '</option>';
-					}
+					// $sqlOpcionesReporteConsolidado = "select * from catalogo where significado_direccion = 'IM' and codigo = 'reporte_consolidado'";
+					// $resOpcionesReporteConsolidado = query($sqlOpcionesReporteConsolidado);
+					// while($filaOpcionesConsolidado = mysql_fetch_array($resOpcionesReporteConsolidado))
+					// {
+					// 	echo '<option value="' . $filaOpcionesConsolidado['cod_catalogo'] . '">' . $filaOpcionesConsolidado['valor'] . '</option>';
+					// }
 					?>
 				</select>				
 			</div>
@@ -116,7 +116,7 @@
 				<button class="buscarIndicador btn btn-info" id="btGenerarConsolidado">Generar Reporte Consolidado</button>
 			</div>
 			<div class="col-sm-12 text-right fa fa-angle-down" id="bMostrarControl"></div>
-		</div>
+		</div> -->
 		<div class="row">
 			<div class="col-sm-12 text-center controles">
 				<button class="buscarIndicador btn btn-info" id="btnGenerarIndicador">Generar Indicador</button>	
@@ -241,7 +241,7 @@
 				</div>
 			</div>			
 		</div>
-		<span class="oculto" id="siglasDepartamento"><?php echo 'IM'; ?></span>			
+		<span class="oculto" id="siglasDepartamento"><?php echo 'FP'; ?></span>			
 	</div>		
 	<script src="../../js/jquery.js"></script>
 	<script src="../../js/bootstrap.js"></script>

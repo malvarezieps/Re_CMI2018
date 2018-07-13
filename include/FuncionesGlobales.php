@@ -57,30 +57,30 @@ function GetInformacionOrg($codigoOrg)
     $resInfoOrg = query($sqlInfoOrg);
     while($filaOrg = mysql_fetch_array($resInfoOrg))
     {
-        array_push($infoOrg, $filaOrg['cod_u_organizaciones']);
-        array_push($infoOrg, $filaOrg['ruc_provisional']);
-        array_push($infoOrg, $filaOrg['ruc_definitivo']);
-        array_push($infoOrg, $filaOrg['organizacion']);
-        array_push($infoOrg, $filaOrg['actividad']);
-        array_push($infoOrg, $filaOrg['categoria_actividad_mp']);
-        array_push($infoOrg, $filaOrg['identificacion_actividad_mp']);
-        array_push($infoOrg, $filaOrg['forma_organizacion']);
-        array_push($infoOrg, $filaOrg['estado_organizacion']);
-        array_push($infoOrg, $filaOrg['num_socios']);
-        array_push($infoOrg, $filaOrg['email']);
-        array_push($infoOrg, $filaOrg['telefono']);
-        array_push($infoOrg, $filaOrg['tipo']);
-        array_push($infoOrg, $filaOrg['circuito_economico']);
-        array_push($infoOrg, $filaOrg['nombre_representante_legal']);
-        array_push($infoOrg, $filaOrg['cod_zona']);
-        array_push($infoOrg, $filaOrg['cod_provincia']);
-        array_push($infoOrg, $filaOrg['cod_canton']);
-        array_push($infoOrg, $filaOrg['cod_parroquia']);
-        array_push($infoOrg, $filaOrg['direccion']);
-        array_push($infoOrg, $filaOrg['celular']);
-        array_push($infoOrg, $filaOrg['num_resolucion']);
-        array_push($infoOrg, $filaOrg['estado_juridico']);
-        array_push($infoOrg, $filaOrg['producto_servicio']);    
+        array_push($infoOrg, $filaOrg['cod_u_organizaciones']);                 // 0
+        array_push($infoOrg, $filaOrg['ruc_provisional']);                      // 1
+        array_push($infoOrg, $filaOrg['ruc_definitivo']);                       // 2
+        array_push($infoOrg, $filaOrg['organizacion']);                         // 3
+        array_push($infoOrg, $filaOrg['actividad']);                            // 4
+        array_push($infoOrg, $filaOrg['categoria_actividad_mp']);               // 5
+        array_push($infoOrg, $filaOrg['identificacion_actividad_mp']);          // 6
+        array_push($infoOrg, $filaOrg['forma_organizacion']);                   // 7
+        array_push($infoOrg, $filaOrg['estado_organizacion']);                  // 8
+        array_push($infoOrg, $filaOrg['num_socios']);                           // 9
+        array_push($infoOrg, $filaOrg['email']);                                // 10
+        array_push($infoOrg, $filaOrg['telefono']);                             // 11
+        array_push($infoOrg, $filaOrg['tipo']);                                 // 12
+        array_push($infoOrg, $filaOrg['circuito_economico']);                   // 13
+        array_push($infoOrg, $filaOrg['nombre_representante_legal']);           // 14
+        array_push($infoOrg, $filaOrg['cod_zona']);                             // 15            
+        array_push($infoOrg, $filaOrg['cod_provincia']);                        // 16
+        array_push($infoOrg, $filaOrg['cod_canton']);                           // 17
+        array_push($infoOrg, $filaOrg['cod_parroquia']);                        // 18
+        array_push($infoOrg, $filaOrg['direccion']);                            // 19
+        array_push($infoOrg, $filaOrg['celular']);                              // 20
+        array_push($infoOrg, $filaOrg['num_resolucion']);                       // 21
+        array_push($infoOrg, $filaOrg['estado_juridico']);                      // 22
+        array_push($infoOrg, $filaOrg['producto_servicio']);                    // 23
 
     }
 
@@ -236,7 +236,7 @@ function GetHeaderTabla($departamento, $mesIndicador)
                                     <th scope='col'>POR EJECUTAR</th>                           
                                     <th scope='col'>ZONA</th>
                                     <th scope='col'>MES</th>
-                                    <th scope='col'>GRÁFICO</th>
+                                    <th scope='col' class='oculto'>GRÁFICO</th>
                                     <th scope='col'>DETALLE</th>
                                     <th scope='col' class='oculto'>CodigoIndicador</th>";
         $tHeader.= "</tr>";
@@ -257,6 +257,33 @@ function GetHeaderTabla($departamento, $mesIndicador)
                                     <th scope='col' class='oculto'>CodigoIndicador</th>";
         $tHeader.= "</tr>";
     }
+
+    if($departamento == 'FP')
+    {
+        $tHeader .= "<tr>
+                        <th colspan=\"1\" class=\"cuadroBlanco\"></th>
+                        <th colspan=\"6\" class=\"colorIndicador total\">SERVICIOS DE LA DIRECCION</th>
+                        <th colspan=\"7\" class=\"colorIndicador1\">CUMPLIMIENTO</th>
+                    </tr>
+                    <tr>
+                        <th scope='col'>INDICE</th>
+                        <th scope='col'>INDICADORES</th>
+                        <th scope='col'>Asesoría para la elaboración de planes de negocio solidarios</th>
+                        <th scope='col'>Cofinanciamiento para proyectos de la EPS</th>
+                        <th scope='col'>Asistencia técnica en procesos administrativos</th>
+                        <th scope='col'>Alianza con instituciones para la AT en procesos operativos</th>
+                        <th scope='col'>Total</th>
+                        <th scope='col'>Meta Periodo</th>
+                        <th scope='col'>% Ejecutado</th>
+                        <th scope='col'>Meta Anual</th>
+                        <th scope='col'>% Avance</th>
+                        <th scope='col'>Zona</th>
+                        <th scope='col'>Mes</th>";                     
+                        
+                        $tHeader .= "<th scope='col'>DETALLE</th>
+                                    <th scope='col' class='oculto'>CodigoIndicador</th>";
+        $tHeader.= "</tr>";
+    }
     $tHeader.= "</thead>";
     return $tHeader;
 }
@@ -265,7 +292,7 @@ function GetHeaderDetalle($departamento, $codIndicador)
 {
     $tHeader = "<thead>";
 
-    if($departamento == 'IM' && $codIndicador == 29)
+    if($departamento == 'IM' && ($codIndicador == 26 || $codIndicador == 27 || $codIndicador == 29))
     {        
             $tHeader .= "<tr>
                             <th scope='col'>ZONA</th>
@@ -290,6 +317,48 @@ function GetHeaderDetalle($departamento, $codIndicador)
                             <th scope='col'>NUEVA ORGANIZACIÓN</th>
                         </tr>";
     }
+
+    if($departamento == 'IM' && ($codIndicador == 30 || $codIndicador == 31 || $codIndicador == 33))
+    {        
+            $tHeader .= "<tr>
+                            <th scope='col'>ZONA</th>
+                            <th scope='col'>PROVINCIA</th>
+                            <th scope='col'>CANTÓN</th>
+                            <th scope='col'>MES REPORTE</th>
+                            <th scope='col'>TIPO ENTIDAD CONTRATANTE</th>
+                            <th scope='col'>NOMBRE ENTIDAD CONTRATANTE</th>
+                            <th scope='col'>FECHA ADJUDICACIÓN DEL CONTRATO</th>
+                            <th scope='col'>CÓDIGO DEL PROCESO</th>
+                            <th scope='col'>CÓDIGO CPC</th>
+                            <th scope='col'>MONTO DE CONTRATACIÓN</th>                            
+                            <th scope='col'>SECTOR PRIORIZADO</th>
+                            <th scope='col'>BIEN O SERVICIO CONTRATADO</th>
+                            <th scope='col'>TIPO ORGANIZACIÓN EPS</th>
+                            <th scope='col'>CIRCUITO ECONÓMICO</th>
+                            <th scope='col'>NOMBRE DE LA ORGANIZACIÓN</th>
+                            <th scope='col'>SIGLAS ORG</th>
+                            <th scope='col'>RUC ORG</th>
+                            <th scope='col'>NUM SOCIOS</th>
+                            <th scope='col'>NUM EMPLEADOS</th>
+                            <th scope='col'>NUEVA ORGANIZACIÓN</th>
+                            <th scope='col'>COD CONTRATACIÓN</th>
+                        </tr>";
+    }
+    if($departamento == 'FP' && ($codIndicador == 42))
+    {        
+            $tHeader .= "<tr>
+                            <th scope='col'>ZONA</th>
+                            <th scope='col'>NOMBRE OEPS</th>
+                            <th scope='col'>RUC ORG</th>
+                            <th scope='col'>NUM SOCIOS</th>
+                            <th scope='col'>DESTINO</th>
+                            <th scope='col'>MONTO</th>
+                            <th scope='col'>PLAZO</th>
+                            <th scope='col'>INTERES</th>
+                            <th scope='col'>VERIFICABLE</th>
+                            <th scope='col'>CÓDIGO DEL COFINANCIAMIENTO</th>                            
+                        </tr>";
+    }
     $tHeader .= "</thead>";
 
     return $tHeader;
@@ -305,32 +374,61 @@ function ImprimirResultado($lineaImprimir, $codIndicador, $arrayImprimir, $depar
     {
         $tamArray = count($arrayImprimir);
         // echo $tamArray . "<br>";
-        if($codIndicador == 29)
+        for($indice = 0; $indice < $tamArray; $indice = $indice + 10)
         {
-            for($indice = 0; $indice < $tamArray; $indice = $indice + 10)
-            {
-                // $contLinea++;
-                $tBody .= "<tr>";
-                $tBody .= "<th scope='row'>" . $contLinea . "</th>";
-                $tBody .= "<td id='" . $contLinea . "-2'>" . $arrayImprimir[$indice] . "</td>
-                            <td id='" . $contLinea . "-3'>" . $arrayImprimir[$indice + 1] . "</td>
-                            <td id='" . $contLinea . "-4'>" . $arrayImprimir[$indice + 2] . "</td>
-                            <td id='" . $contLinea . "-5'>" . $arrayImprimir[$indice + 3] . "</td>
-                            <td id='" . $contLinea . "-6'>" . $arrayImprimir[$indice + 4] . "</td>
-                            <td id='" . $contLinea . "-7'>" . $arrayImprimir[$indice + 5] . "</td>
-                            <td id='" . $contLinea . "-8'>" . $arrayImprimir[$indice + 6] . "</td>
-                            <td id='" . $contLinea . "-9'>" . $arrayImprimir[$indice + 7] . "</td>
-                            <td id='" . $contLinea . "-10'>" . $arrayImprimir[$indice + 8] . "</td>
-                            <td id='" . $contLinea . "-11'>" . $arrayImprimir[$indice + 9] . "</td>
-                            <td id='" . $contLinea . "-12'>" . $zonaIndicador . "</td>
-                            <td id='" . $contLinea . "-13'>" . $nombreMeses[$mesIndicador] . "</td>
-                            <td><button id='" . $contLinea . "-14' onclick='VerGrafica(this.id)' type='button' class='btn btn-warning'>Ver</button></td>
-                            <td><button id='" . $contLinea . "-15' onclick='DesplegarInfo(this.id, \"IM\")' type='button' class='btn btn-warning'>Desplegar</button></td>
-                            <td id=" . $contLinea . "-16 class='oculto'>" . $codIndicador . "</td>";
-                $tBody .= "</tr>";
-            }
+            // $contLinea++;
+            $tBody .= "<tr>";
+            $tBody .= "<th scope='row'>" . $contLinea . "</th>";
+            $tBody .= "<td id='" . $contLinea . "-2'>" . $arrayImprimir[$indice] . "</td>
+                        <td id='" . $contLinea . "-3'>" . $arrayImprimir[$indice + 1] . "</td>
+                        <td id='" . $contLinea . "-4'>" . $arrayImprimir[$indice + 2] . "</td>
+                        <td id='" . $contLinea . "-5'>" . $arrayImprimir[$indice + 3] . "</td>
+                        <td id='" . $contLinea . "-6'>" . $arrayImprimir[$indice + 4] . "</td>
+                        <td id='" . $contLinea . "-7'>" . $arrayImprimir[$indice + 5] . "</td>
+                        <td id='" . $contLinea . "-8'>" . $arrayImprimir[$indice + 6] . "</td>
+                        <td id='" . $contLinea . "-9'>" . $arrayImprimir[$indice + 7] . "</td>
+                        <td id='" . $contLinea . "-10'>" . $arrayImprimir[$indice + 8] . "</td>
+                        <td id='" . $contLinea . "-11'>" . $arrayImprimir[$indice + 9] . "</td>
+                        <td id='" . $contLinea . "-12'>" . $zonaIndicador . "</td>
+                        <td id='" . $contLinea . "-13'>" . $nombreMeses[$mesIndicador] . "</td>
+                        <td class='oculto'><button id='" . $contLinea . "-14' onclick='VerGrafica(this.id)' type='button' class='btn btn-warning'>Ver</button></td>
+                        <td><button id='" . $contLinea . "-15' onclick='DesplegarInfo(this.id, \"IM\")' type='button' class='btn btn-warning'>Desplegar</button></td>
+                        <td id=" . $contLinea . "-16 class='oculto'>" . $codIndicador . "</td>";
+            $tBody .= "</tr>";
+        }
             
-        }       
+        
+        
+    }
+
+    if($departamento == 'FP')
+    {
+        $tamArray = count($arrayImprimir);
+        // echo $tamArray . "<br>";
+        for($indice = 0; $indice < $tamArray; $indice = $indice + 10)
+        {
+            // $contLinea++;
+            $tBody .= "<tr>";
+            $tBody .= "<th scope='row'>" . $contLinea . "</th>";
+            $tBody .= "<td id='" . $contLinea . "-2'>" . $arrayImprimir[$indice] . "</td>
+                        <td id='" . $contLinea . "-3'>" . $arrayImprimir[$indice + 1] . "</td>
+                        <td id='" . $contLinea . "-4'>" . $arrayImprimir[$indice + 2] . "</td>
+                        <td id='" . $contLinea . "-5'>" . $arrayImprimir[$indice + 3] . "</td>
+                        <td id='" . $contLinea . "-6'>" . $arrayImprimir[$indice + 4] . "</td>
+                        <td id='" . $contLinea . "-7'>" . $arrayImprimir[$indice + 5] . "</td>
+                        <td id='" . $contLinea . "-8'>" . $arrayImprimir[$indice + 6] . "</td>
+                        <td id='" . $contLinea . "-9'>" . $arrayImprimir[$indice + 7] . "</td>
+                        <td id='" . $contLinea . "-10'>" . $arrayImprimir[$indice + 8] . "</td>
+                        <td id='" . $contLinea . "-11'>" . $arrayImprimir[$indice + 9] . "</td>
+                        <td id='" . $contLinea . "-12'>" . $zonaIndicador . "</td>
+                        <td id='" . $contLinea . "-13'>" . $nombreMeses[$mesIndicador] . "</td>
+                        <td class='oculto'><button id='" . $contLinea . "-14' onclick='VerGrafica(this.id)' type='button' class='btn btn-warning'>Ver</button></td>
+                        <td><button id='" . $contLinea . "-15' onclick='DesplegarInfo(this.id, \"FP\")' type='button' class='btn btn-warning'>Desplegar</button></td>
+                        <td id=" . $contLinea . "-16 class='oculto'>" . $codIndicador . "</td>";
+            $tBody .= "</tr>";
+        }
+            
+        
         
     }
     
@@ -340,9 +438,15 @@ function ImprimirResultado($lineaImprimir, $codIndicador, $arrayImprimir, $depar
 function CalculoPorcentaje($valorLimite, $valorObtenido)
 {
     $porcentaje = 0;
-
-    $porcentaje = ($valorObtenido * 100) / $valorLimite;
-    $porcentaje = round($porcentaje, 2); 
+    if($valorLimite == 0)
+    {
+        $porcentaje = ($valorObtenido * 100);   
+    }
+    else
+    {
+        $porcentaje = ($valorObtenido * 100) / $valorLimite;
+        $porcentaje = round($porcentaje, 2);         
+    }
 
     return $porcentaje;
 }
@@ -401,6 +505,23 @@ function GetNombreEntidadContratante($codEntidadContratante)
         $entidad = $filaEntidad['entidad_contratante'];
     }
     return $entidad;
+}
+
+function QuitarDuplicadosArray($arrayInicial, $arrayComparar)
+{
+    $arrayResultado = array();
+    $cont = 0;
+    foreach ($arrayInicial as $valor) 
+    {
+        if(in_array($valor, $arrayComparar))
+        {
+            unset($arrayInicial[$cont]);
+        }
+        $cont++;
+    }
+
+    $arrayResultado = array_unique($arrayInicial);
+    return $arrayResultado;
 }
 
 ?>

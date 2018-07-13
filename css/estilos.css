@@ -96,11 +96,6 @@ thead
 	text-align: center;
 }
 
-.controles
-{
-	margin-top: 20px;
-}
-
 .myModal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -158,6 +153,11 @@ thead
     padding-top: 10px;
 }
 
+.controlConsolidado
+{
+    display: none;
+}
+
 #DatosGenerados
 {
 	overflow: auto;
@@ -167,6 +167,12 @@ thead
 #DatosGenerados tbody
 {
     font-size: 10px;
+}
+
+#bMostrarControl
+{
+    font-size: 32px;
+    cursor: pointer;    
 }
 
 /*#myBar 
