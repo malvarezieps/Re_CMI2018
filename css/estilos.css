@@ -175,6 +175,11 @@ thead
     cursor: pointer;    
 }
 
+.cuadroBlanco
+{
+    background: #e6e6e6;
+}
+
 /*#myBar 
 {
     width: 10%;
