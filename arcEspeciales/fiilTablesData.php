@@ -2,7 +2,7 @@
 include ('../lib/dbconfig.php');
 
 
-FillVisitas();
+FillAsistencias();
 
 function FillVisitas()
 {
@@ -37,4 +37,34 @@ function FillVisitas()
 		echo 'Deal<br>';
 
 	}
+}
+
+function FillAsistencias()
+{
+	$sql = "select * from fp_asesoria_asistencia_cofinanciamiento where year(fecha_reporte) = 2018";
+	$res = query($sql);
+
+	while($fila = mysql_fetch_array($res))
+	{
+		$codLinea = $fila['cod_asesoria_asistencia_cofinanciamiento'];
+		$opcRand = mt_rand(1, 3);
+		$sqlUpdate = '';
+		if($opcRand == 1)
+		{
+			$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set tipo_asistencia = 'tecnica' where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;
+		}
+		if($opcRand == 2)
+		{
+			$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set tipo_asistencia = 'administrativa' where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;
+		}
+		if($opcRand == 3)
+		{
+			$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set tipo_asistencia = 'operativa' where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;
+		}
+
+		query($sqlUpdate);
+		echo $sqlUpdate . "<br>";
+	}
+
+	echo "Deal all works!!<br>";
 }
