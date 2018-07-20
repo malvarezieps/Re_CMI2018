@@ -9,7 +9,7 @@ $codAnio = GetAnio();
 $codDepartamento = GetDepartamento();
 $codAccion = GetAccion();
 // echo $codIndicador . ' - ' . $codZona . ' - ' . $codMes . ' - ' . $codAnio . ' - ' . $codDepartamento . ' - ' . $codAccion .  "<br>";
-$nombreMeses = array('Enero', 'Febrero', 'Marzo',   'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+$nombreMesesFp = array('Enero', 'Febrero', 'Marzo',   'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
 
 $accionRequerida = GetAccion();
 
@@ -33,7 +33,7 @@ function ImprimirResultadoPantalla($accion)
 {
     // echo $accion . "<br>";
     // global $departamento, $anio, $mes, $codIndicador;
-    global $arrayIndicadores;
+    global $arrayIndicadores, $nombreMesesFp;
     $departamentoConsulta = GetDepartamento();
     $anioConsulta = GetAnio();
     $mesConsulta = GetMes();
@@ -43,8 +43,7 @@ function ImprimirResultadoPantalla($accion)
     $arrayNombreIndicadores = array();
     $arrayMeses = array();
     $arrayZonas = array();
-    $arrayResultado = array();
-    $nombreMeses = array('Enero', 'Febrero', 'Marzo',   'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+    $arrayResultado = array();    
     $arrayIndicadores = GetIndicadores($departamentoConsulta, $anioConsulta);
     // print_r2($arrayIndicadores);
     $tableBody = "<table class='table table-striped table-bordered table-hover'>";
@@ -132,6 +131,11 @@ function ImprimirResultadoPantalla($accion)
                         $contLinea++;
                         $arrayResultado = CalcularIndicador($valueCodIndicadores, $valueMes, $valueZona, $anioConsulta);
                     }
+                    if($valueCodIndicadores == 44 && ($valueMes == 3 || $valueMes == 6 || $valueMes == 9 || $valueMes == 12))
+                    {
+                        $contLinea++;
+                        $arrayResultado = CalcularIndicador($valueCodIndicadores, $valueMes, $valueZona, $anioConsulta);
+                    }
                     // else
                     // {
                     //     $arrayResultado = CalcularIndicador($valueCodIndicadores, $valueMes, $valueZona, $anioConsulta);
@@ -185,6 +189,15 @@ function CalcularIndicador($codIndicador, $mesIndicador, $zonaIndicador, $anioIn
         $resIndicadorCofinanciamiento = Indicador02($zonaIndicador, $mesIndicador, $anioIndicador, $codIndicador, 'org', 'numerico');
         $resIndicadorAsistencia = 0;
         $resIndicadorAlianza = 0;
+    }
+    if($codIndicador == 44 )
+    {
+        // PORCENTAJES DE OEPS COFINANCIADAS QUE RECIBEN MONITOREO POSTERIOR AL CIERRE DEL CONVENIO Y SE ENCUENTRAN OPERATIVAS
+        // $resIndicadorAsesoria = 0;
+        // $resIndicadorCofinanciamiento = Indicador02($zonaIndicador, $mesIndicador, $anioIndicador, $codIndicador, 'org', 'numerico');
+        // $resIndicadorAsistencia = 0;
+        // $resIndicadorAlianza = 0;
+        Indicador03($zonaIndicador, $mesIndicador, $anioIndicador, $codIndicador, 'org', 'numerico');
     }
 
     // se añade el resultado de los indicadores
@@ -263,12 +276,12 @@ function RevisarOrgReportadas($zonaConsulta, $mesConsulta, $anioConsulta, $codIn
 
 function ImprimirDetalleIndicador()
 {
+    global $nombreMesesFp;
     $codIndicadorConsulta = $_POST['codIndicador'];
     $zonaIndicadorConsulta = $_POST['codZona'];
     $mesIndicadorConsulta = $_POST['codMes'];
     $anioIndicadorConsulta = $_POST['anio'];
     $departamentoConsulta = $_POST['departamento'];
-    $nombreMeses = array('Enero', 'Febrero', 'Marzo',   'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
     $detalleIndicador = array();
 
     // echo $codIndicadorConsulta . "<br>";
@@ -475,7 +488,7 @@ function Indicador01($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
 function Indicador02($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorConsulta, $tipoOrg, $tipoReporte)
 {
     //VARIABLES
-    global $nombreMeses;
+    global $nombreMesesFp;
     $aOrganizaciones = array();
     $arrayFinal = array();
     $sqlIndicador = '';
@@ -535,6 +548,8 @@ function Indicador02($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
         // variable que tendra el detalle de la informacion del indicador
         $aDetalleFinal = array();
 
+        // print_r2($arrayFinal);
+
         while($filaCof = mysql_fetch_array($resIndicador))
         {
             array_push($aOrgSinFiltrar, $filaCof['cod_u_organizaciones']);
@@ -552,7 +567,7 @@ function Indicador02($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
             $numSociosOrg = GetNumSocios($valorOrg);            
             array_push($aDetalleFinal, $zonaConsulta);                          // zona            
             array_push($aDetalleFinal, $aInfoOrg[3]);                           // nombre org
-            array_push($aDetalleFinal, $aInfoOrg[2] . ' - ' . $aInfoOrg[1]);    // ruc definitivo y provisional
+            array_push($aDetalleFinal, "<span>D: " . $aInfoOrg[2] . "</span><br><span>P: " . $aInfoOrg[1]) . "</span>";    // ruc definitivo y provisional
             array_push($aDetalleFinal, $numSociosOrg);                          // num socios
             
             // Para obtener los datos faltantes se debe recorrer el array de organizaciones sin filtrar
@@ -567,13 +582,20 @@ function Indicador02($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
             {
                 if($valorOrgSinFiltrar == $valorOrg)
                 {
-                    $seguimientoCof .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $aSeguimiento[$posArray] . "</p>";
-                    $orgOperativas .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $aOperativas[$posArray] . "</p>";
-                    $mesCofinanciamiento .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $nombreMeses[$aMesConf[$posArray]] . "</p>";
+                    $seguimientoCof .= "<span> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $aSeguimiento[$posArray] . "</span>";
+                    $orgOperativas .= "<span> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $aOperativas[$posArray] . "</span>";
+                    $mesCofinanciamiento .= "<span> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $nombreMesesFp[$aMesConf[$posArray]] . "</span>";
                     $auxVisitas = GetFechaVisita($aCofinanciamiento[$posArray], $anioConsulta);
                     foreach ($auxVisitas as $auxFecha) 
-                    {                        
-                        $fechasVisitas .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $auxFecha . "</p>";
+                    {
+                        if(count($auxVisitas) > 1)
+                        {
+                            $fechasVisitas .= "<span> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $auxFecha . "</span><br>";
+                        }
+                        else
+                        {
+                            $fechasVisitas .= "<span> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $auxFecha . "</span>";
+                        }
                     }
                 }
                 else
@@ -599,7 +621,157 @@ function Indicador02($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
 // ***********************************************************************************
 function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorConsulta, $tipoOrg, $tipoReporte)
 {
-    // $sqlIndicador = "select * "
+    //VARIABLES
+    global $nombreMesesFp;
+    $aOrganizaciones = array();
+    $arrayFinal = array();
+    $sqlIndicadorAdministrativo = '';
+    $sqlIndicadorOperativa = '';
+    $mesInicioConsulta = 0;
+    // El indicador es trimestral, por lo cual solo puede mostrarse en marzo, junio, septiembre, diciembre
+    switch ($mesConsulta) 
+    {
+        // Dependiendo del mes de consulta, el rango de seleccion cambia
+        // mesConsulta = 3, rango = 1 - 3
+        // mesConsulta = 6, rango = 4 - 6
+        // mesConsulta = 9, rango = 7 - 9
+        // mesConsulta = 12, rango = 10 - 12
+        case 3:
+        {
+            $mesInicioConsulta = 1;            
+            break;           
+        }
+
+        case 6:
+        {
+
+            $mesInicioConsulta = 4;            
+            break;           
+        }
+
+        case 9:
+        {
+            $mesInicioConsulta = 7;
+             
+            break;           
+        }
+
+        case 12:
+        {
+            $mesInicioConsulta = 10;            
+            break;           
+        }        
+    }
+
+    // Con el nuevo mes de Inicio y mes de consulta original, se forma la sentencia sql
+    // Como se tiene que reportar los servicios 3 y 4 por separado, se genera dos sentencias sql para cada caso
+    $sqlIndicadorAdministrativo = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.seguimiento_cof, f.org_operativas, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio = 3 group by f.cod_u_organizaciones order by mesCof";
+
+    $sqlIndicadorOperativa = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.seguimiento_cof, f.org_operativas, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio = 4 group by f.cod_u_organizaciones order by mesCof";
+    
+    echo $sqlIndicadorAdministrativo . " - " . $sqlIndicadorOperativa . "<br>";
+
+    // //se ejecuta la sentencia sql
+    // $resIndicador = query($sqlIndicador);
+
+    // // se obtiene los datos consultados
+    // while($filaIndicador = mysql_fetch_array($resIndicador))
+    // {
+    //     array_push($aOrganizaciones, $filaIndicador['cod_u_organizaciones']);
+    // }    
+
+    // if($mesConsulta <= 6)
+    // {
+    //     $arrayFinal = $aOrganizaciones;
+    // }
+    // else
+    // {
+    //     $aOrganizacionesReportadas = RevisarOrgReportadas($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorConsulta);
+    //     $arrayFinal = QuitarDuplicadosArray($aOrganizaciones, $aOrganizacionesReportadas);
+    // }
+
+    // // print_r2($aOrganizacionesReportadas);
+    // // print_r2($arrayFinal);
+
+    // // DEPENDIENDO DEL TIPO DE REPORTE, SE NECESITA ENVIAR DATOS NUMERICOS O DESAGREGADOS
+    // if($tipoReporte == 'numerico')
+    // {
+    //     return count($arrayFinal);
+    // }
+
+    // if($tipoReporte == 'detalle')
+    // {
+    //     // La sentencia sql para detalles necesita generar todos los datos de una organizacion incluso si esta se repite, para temas
+    //     // de reporte              
+    //     // Se ejecuta la sentencia sql para generar el detalle de la información
+    //     $resIndicador = query($sqlIndicador);
+    //     // Variables
+    //     $aCofinanciamiento = array();                   // guarda codigos del campo cod_asesoria_asistencia_cofinanciamiento
+    //     $aOrgSinFiltrar = array();                      // guarda codigos de organizaciones, puede tener duplicados
+    //     $aSeguimiento = array();                        // guarda los datos del campo seguimiento_cof
+    //     $aOperativas = array();                         // guarda datos del campo org_operativas
+    //     $aMesConf = array();                            // gurada el mes en el que fue hecha el cofinanciamiento
+
+    //     // variable que tendra el detalle de la informacion del indicador
+    //     $aDetalleFinal = array();
+
+    //     while($filaCof = mysql_fetch_array($resIndicador))
+    //     {
+    //         array_push($aOrgSinFiltrar, $filaCof['cod_u_organizaciones']);
+    //         array_push($aCofinanciamiento, $filaCof['cod_asesoria_asistencia_cofinanciamiento']);
+    //         array_push($aSeguimiento, $filaCof['seguimiento_cof']);
+    //         array_push($aOperativas, $filaCof['org_operativas']);
+    //         array_push($aMesConf, $filaCof['mesCof']);
+
+    //     }        
+
+    //     // Reviso las organizaciones a reportar que se encuentran en el array $arrayFinal
+    //     foreach($arrayFinal as $valorOrg)
+    //     {
+    //         $aInfoOrg = GetInformacionOrg($valorOrg);
+    //         $numSociosOrg = GetNumSocios($valorOrg);            
+    //         array_push($aDetalleFinal, $zonaConsulta);                          // zona            
+    //         array_push($aDetalleFinal, $aInfoOrg[3]);                           // nombre org
+    //         array_push($aDetalleFinal, $aInfoOrg[2] . ' - ' . $aInfoOrg[1]);    // ruc definitivo y provisional
+    //         array_push($aDetalleFinal, $numSociosOrg);                          // num socios
+            
+    //         // Para obtener los datos faltantes se debe recorrer el array de organizaciones sin filtrar
+    //         // Cuando se encuentre el codigo en dicho array, tomamos su posicion y con ella 
+    //         // consultamos los valores guardados en la misma posicion en los otros arrays como aCofinanciamiento
+    //         $posArray = 0;
+    //         $seguimientoCof = '';           // Guarda la info de seguimientos de acuerdo al codigo de la organizacion
+    //         $orgOperativas = '';            // Guarda la info registrada en el campo org_operativas
+    //         $fechasVisitas = '';            // Guarda las visitas (si las tuvieran) registradas por el codigo de cofinanciamiento
+    //         $mesCofinanciamiento = '';      // Guarda el mes en el que se realizo el cofinanciamiento
+    //         foreach($aOrgSinFiltrar as $valorOrgSinFiltrar)
+    //         {
+    //             if($valorOrgSinFiltrar == $valorOrg)
+    //             {
+    //                 $seguimientoCof .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $aSeguimiento[$posArray] . "</p>";
+    //                 $orgOperativas .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $aOperativas[$posArray] . "</p>";
+    //                 $mesCofinanciamiento .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $nombreMesesFp[$aMesConf[$posArray]] . "</p>";
+    //                 $auxVisitas = GetFechaVisita($aCofinanciamiento[$posArray], $anioConsulta);
+    //                 foreach ($auxVisitas as $auxFecha) 
+    //                 {                        
+    //                     $fechasVisitas .= "<p> COD CMI: " . $aCofinanciamiento[$posArray] . " - " . $auxFecha . "</p>";
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 $posArray++;
+    //             }
+    //         }
+
+    //         // añado los datos encontrados al array de detalle
+    //         array_push($aDetalleFinal, $seguimientoCof);
+    //         array_push($aDetalleFinal, $orgOperativas);
+    //         array_push($aDetalleFinal, $fechasVisitas);
+    //         array_push($aDetalleFinal, $mesCofinanciamiento);                        // mes
+
+    //     }
+       
+    //    return $aDetalleFinal;
+    // }
 }
 
 
