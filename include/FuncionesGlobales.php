@@ -374,6 +374,20 @@ function GetHeaderDetalle($departamento, $codIndicador)
                             <th scope='col'>FECHA VISITAS</th>                            
                         </tr>";
     }
+
+    if($departamento == 'FP' && ($codIndicador == 44))
+    {        
+            $tHeader .= "<tr>
+                            <th scope='col'>INDICE</th>
+                            <th scope='col'>ZONA</th>
+                            <th scope='col'>MES</th>
+                            <th scope='col'>NOMBRE OEPS</th>
+                            <th scope='col'>RUC ORG</th>
+                            <th scope='col'>NUM SOCIOS</th>
+                            <th scope='col'>TIPO ASISTENCIA</th>
+                            <th scope='col'>SECTOR PRODUCTIVO</th>                                                        
+                        </tr>";
+    }
     $tHeader .= "</thead>";
 
     return $tHeader;
