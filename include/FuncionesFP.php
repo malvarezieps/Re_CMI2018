@@ -256,16 +256,8 @@ function RevisarOrgReportadas($zonaConsulta, $mesConsulta, $anioConsulta, $codIn
             $sqlReportadas = "select * from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) < 7 and f.cod_servicio = 2 group by f.cod_u_organizaciones";
             // echo $sqlReportadas . "<br>";
         }
-
-        if($codIndicadorConsulta == 44 and $opcEspecial == 'administrativa')
-        {
-            $sqlReportadas = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.seguimiento_cof, f.org_operativas, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) < " . ($mesConsulta - 2) . " and f.cod_servicio = 3 group by f.cod_u_organizaciones order by mesCof";
-        }
-        if($codIndicadorConsulta == 44 and $opcEspecial == 'operativa')
-        {
-            $sqlReportadas = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.seguimiento_cof, f.org_operativas, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) < " . ($mesConsulta - 2) . " and f.cod_servicio = 4 group by f.cod_u_organizaciones order by mesCof";
-        }
-        if($codIndicadorConsulta == 44 and $opcEspecial == 'todos')
+        
+        if($codIndicadorConsulta == 44)
         {
             $sqlReportadas = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.seguimiento_cof, f.org_operativas, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) < " . ($mesConsulta - 2) . " and f.cod_servicio in (3, 4) group by f.cod_u_organizaciones order by mesCof";
         }
@@ -773,7 +765,7 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
 
     if($tipoAsistencia == 'todos')
     {
-         $sqlIndicador = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.tipo_asistencia, month(f.fecha_reporte) as mesCof, f.cod_servicio, f.fecha_reporte from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio in (3, 4) group by f.cod_u_organizaciones order by f.fecha_reporte, f.cod_servicio";
+         $sqlIndicador = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.tipo_asistencia, month(f.fecha_reporte) as mesCof, f.cod_servicio, f.fecha_reporte from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio in (3, 4) group by f.cod_u_organizaciones order by f.cod_u_organizaciones, f.fecha_reporte, f.cod_servicio";
     }
 
     // echo $sqlIndicador . "<br>";
@@ -827,6 +819,7 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
     }
 
     // print_r2($aOrganizacionesReportadas);
+    // echo 'Array Org Final ' . $tipoAsistencia . '<br>';
     // print_r2($arrayFinal);
 
     // DEPENDIENDO DEL TIPO DE REPORTE, SE NECESITA ENVIAR DATOS NUMERICOS O DESAGREGADOS
@@ -867,6 +860,7 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
 
         }
 
+        // echo 'Array Org sin Finltrar <br>';
         // print_r2($aOrgSinFiltrar);
 
         // Reviso las organizaciones a reportar que se encuentran en el array $arrayFinal
