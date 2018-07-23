@@ -253,7 +253,7 @@ function RevisarOrgReportadas($zonaConsulta, $mesConsulta, $anioConsulta, $codIn
         if($codIndicadorConsulta == 43)
         {
             // Organizaciones reportadas en meses anteriores
-            $sqlReportadas = "select * from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) < 7 group by f.cod_u_organizaciones";
+            $sqlReportadas = "select * from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) < 7 and f.cod_servicio = 2 group by f.cod_u_organizaciones";
             // echo $sqlReportadas . "<br>";
         }
 
@@ -407,6 +407,53 @@ function GetFechaVisita($codigoCofinanciamiento, $anioConsulta)
         array_push($resFechas, $filaFechaVisita['fecha_visita']);
     }
     return $resFechas;
+}
+
+function RevisarPrimerRegistro($codOrganizacion, $zonaConsulta,$mesInicioConsulta, $mesConsulta, $anioConsulta, $codServicio, $codIndicadorConsulta)
+{
+    // Se revisa si existen más servicios vinculados a la organizacion
+    // Si existieran, se debe saber si el primer reporte tiene el codigo del servicio a reportar
+    // Si estos coinciden, la organizacion debe ser reportada, caso contrario la organizacion no tiene que ser reportada con el servicio consultado
+    // Codigos de servicio 
+    // 1 = Asesoría para la elaboración de planes de negocio solidarios
+    // 2 = Cofinanciamiento para proyectos de la EPS
+    // 3 = Asistencia técnica en procesos administrativos
+    // 4 = Alianza con instituciones para la AT en procesos operativos
+
+    $sqlServicios = '';    
+    $seReporta = 0;
+    $sqlServicios = '';
+    if($codIndicadorConsulta == 44)
+    {        
+        $sqlServicios = "select cod_u_organizaciones, cod_servicio, fecha_reporte from fp_asesoria_asistencia_cofinanciamiento where cod_u_organizaciones = " . $codOrganizacion . " and year(fecha_reporte) = " . $anioConsulta . " and month(fecha_reporte) >= " . $mesInicioConsulta . " and month(fecha_reporte) <= "  . $mesConsulta . " and zona = " . $zonaConsulta . " and cod_servicio in (3, 4) order by fecha_reporte";
+        $resServicios = query($sqlServicios);
+        $numRegistros = mysql_num_rows($resServicios);        
+
+        if($numRegistros == 1)
+        {
+            $seReporta = 1;
+        }
+        else
+        {
+            while($filaRegistros = mysql_fetch_array($resServicios))
+            {
+                if($codServicio == $filaRegistros['cod_servicio'])
+                {
+                    $seReporta = 1;         // se reporta
+                    break;
+                }
+                else
+                {
+                    $seReporta = 0;         // no se reporta
+                    break;
+                }
+            }
+        }
+    }
+
+
+    return $seReporta;
+
 }
 
 
@@ -673,6 +720,7 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
     $arrayFinal = array();    
     $sqlIndicador = '';
     $mesInicioConsulta = 0;
+    $codServicioConsulta = 0;
     // El indicador es trimestral, por lo cual solo puede mostrarse en marzo, junio, septiembre, diciembre
     switch ($mesConsulta) 
     {
@@ -715,15 +763,17 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
     {
         $sqlIndicador = "select f.cod_u_organizaciones from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio = 3 group by f.cod_u_organizaciones";
         
+        $codServicioConsulta = 3;
     }
     if($tipoAsistencia == 'operativa')
     {
-        $sqlIndicador = "select f.cod_u_organizaciones from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio = 4 group by f.cod_u_organizaciones ";        
+        $sqlIndicador = "select f.cod_u_organizaciones from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio = 4 group by f.cod_u_organizaciones ";
+        $codServicioConsulta = 4;        
     }
 
     if($tipoAsistencia == 'todos')
     {
-         $sqlIndicador = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.tipo_asistencia, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio in (3, 4) order by mesCof, f.cod_servicio";
+         $sqlIndicador = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.tipo_asistencia, month(f.fecha_reporte) as mesCof, f.cod_servicio, f.fecha_reporte from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio in (3, 4) group by f.cod_u_organizaciones order by f.fecha_reporte, f.cod_servicio";
     }
 
     // echo $sqlIndicador . "<br>";
@@ -734,7 +784,27 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
     // se obtiene los datos consultados
     while($filaIndicador = mysql_fetch_array($resIndicador))
     {
-        array_push($aOrganizaciones, $filaIndicador['cod_u_organizaciones']);
+        // Se debe revisar, si existen mas registros de la organizacion, si fuera el caso
+        // se debe reportar solo el primer servicio reportado
+        // por lo cual se debe revisar el primer registro de la base de datos correspondiente a la organizacion
+        // Los codigos del servicio, dependen del tipo de asistencia
+        // administrativa = 3
+        // operativa = 4
+        // Si $codServicioConsulta tiene otro valor, se refiere al caso en que necesita reportar los detalles, por lo cual no se hace la destincion
+
+        if($codServicioConsulta >= 3)
+        {
+            $seDebeReportar = RevisarPrimerRegistro($filaIndicador['cod_u_organizaciones'], $zonaConsulta, $mesInicioConsulta, $mesConsulta, $anioConsulta, $codServicioConsulta, $codIndicadorConsulta);
+
+            if($seDebeReportar == 1)
+            {
+                array_push($aOrganizaciones, $filaIndicador['cod_u_organizaciones']);
+            }            
+        }
+        else
+        {
+            array_push($aOrganizaciones, $filaIndicador['cod_u_organizaciones']);            
+        }
     }
     // print_r2($aOrganizaciones);    
 
@@ -751,6 +821,11 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
         $arrayFinal = QuitarDuplicadosArray($aOrganizaciones, $aOrganizacionesReportadas);
     }
 
+    foreach ($arrayFinal as $orgReportar) 
+    {
+        // Se debe revisar si las organizaciones a reportar, tienen mas registros en el mes
+    }
+
     // print_r2($aOrganizacionesReportadas);
     // print_r2($arrayFinal);
 
@@ -765,8 +840,10 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
         // La sentencia sql para detalles necesita generar todos los datos de una organizacion incluso si esta se repite, para temas
         // de reporte              
         // Se ejecuta la sentencia sql para generar el detalle de la información
-        // $sqlIndicador = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.tipo_asistencia, month(f.fecha_reporte) as mesCof from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio in (3, 4) order by mesCof, f.cod_servicio";
 
+        $sqlIndicador = "select f.cod_u_organizaciones, f.cod_asesoria_asistencia_cofinanciamiento, f.tipo_asistencia, month(f.fecha_reporte) as mesCof, f.cod_servicio, f.fecha_reporte from fp_asesoria_asistencia_cofinanciamiento f inner join u_organizaciones o on (o.cod_u_organizaciones = f.cod_u_organizaciones ) where f.zona = " . $zonaConsulta . " and year(f.fecha_reporte) = " . $anioConsulta . " and month(f.fecha_reporte) >= " . $mesInicioConsulta . " and month(f.fecha_reporte) <= " . $mesConsulta . " and f.cod_servicio in (3, 4) order by f.cod_u_organizaciones, f.fecha_reporte, f.cod_servicio";
+
+       
         // echo $sqlIndicador . "<br>";
         $resIndicador = query($sqlIndicador);
         // Variables
@@ -786,6 +863,7 @@ function Indicador03($zonaConsulta, $mesConsulta, $anioConsulta, $codIndicadorCo
             array_push($aCofinanciamiento, $filaCof['cod_asesoria_asistencia_cofinanciamiento']);            
             array_push($aMesConf, $filaCof['mesCof']);
             array_push($aTipoAsistencia, $filaCof['tipo_asistencia']);
+            array_push($aCodServicio, $filaCof['cod_servicio']);
 
         }
 
