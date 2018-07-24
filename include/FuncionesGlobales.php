@@ -388,6 +388,26 @@ function GetHeaderDetalle($departamento, $codIndicador)
                             <th scope='col'>SECTOR PRODUCTIVO</th>                                                        
                         </tr>";
     }
+
+    if($departamento == 'FP' && ($codIndicador == 45))
+    {        
+            $tHeader .= "<tr>
+                            <th scope='col'>INDICE</th>
+                            <th scope='col'>ZONA</th>
+                            <th scope='col'>MES</th>
+                            <th scope='col'>NOMBRE OEPS</th>
+                            <th scope='col'>RUC ORG</th>
+                            <th scope='col'>NUM SOCIOS</th>
+                            <th scope='col'>DESTINO</th>                            
+                            <th scope='col'>ES ARTICULADO</th>
+                            <th scope='col'>ACCEDIERON A CRÉDITO</th>
+                            <th scope='col'>MONTO DE CREDITO</th>
+                            <th scope='col'>PLAZO</th>
+                            <th scope='col'>INTERES</th>
+                            <th scope='col'>ACOMPAÑAMIENTO</th>
+                            <th scope='col'>PROGRAMA / PRODUCTO</th>
+                        </tr>";
+    }
     $tHeader .= "</thead>";
 
     return $tHeader;
