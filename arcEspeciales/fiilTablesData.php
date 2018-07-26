@@ -1,7 +1,7 @@
 <?php 
 include ('../lib/dbconfig.php');
 
-FillAccesoCredito();
+FillTecnologiaData();
 
 function FillVisitas()
 {
@@ -140,6 +140,79 @@ function FillAccesoCredito()
 		}
 
 		$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set destino_credito = '" . $destinoCredito . "', credito_articulado = '" . $esArticulado . "', accede_credito = '" . $accedeCredito . "', monto_credito = '" . $valorMontoCredito . "', plazo_credito = '" . $valorMontoPlazo . "', interes_credito = '" . $valorInteresCredito . "', acompanamiento = '" . $valorAcompanamiento . "', programa_producto = '" . $valorProgramaProducto . "'  where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;
+
+		query($sqlUpdate);
+		echo $sqlUpdate . "<br>";
+	}
+
+	echo "Deal all works!!<br>";
+}
+
+function FillTecnologiaData()
+{
+	$sql = "select * from fp_asesoria_asistencia_cofinanciamiento where year(fecha_reporte) = 2018";
+	$res = query($sql);
+	$arraySectorTec = array('sector 01', 'sector 02', 'sector 03', 'sector 04');
+	$aAccesoTec = array('FACTURAS POR LA COMPRA DE RECURSOS',
+							'APLICACION DE CONOCIMIENTOS ADQUIRIDOS',
+							'MEJORAMIENTO DE FLUJO DE PROCESOS'
+							);	
+
+	while($fila = mysql_fetch_array($res))
+	{
+		$codLinea = $fila['cod_asesoria_asistencia_cofinanciamiento'];
+		$opcRand = mt_rand(1, 2);
+		$sqlUpdate = '';
+
+		$accedioTec = '';
+		$valorSectorTec = '';
+		$valorAccesoTecMediante = '';
+		
+		if($opcRand == 1)
+		{
+
+			$accedioTec = 'si';			
+
+			$randomico = mt_rand(0, 3);
+			$valorSectorTec = $arraySectorTec[$randomico];
+			
+			$randomico = mt_rand(0, 4);
+			if($randomico >= 0 && $randomico <= 2)
+			{
+				$valorAccesoTecMediante = $aAccesoTec[$randomico];
+			}
+			if($randomico == 3)
+			{
+				$inicio = mt_rand(0, 1);
+				$fin = mt_rand($inicio, 2);
+				if($inicio <= $fin)
+				{
+					for($i = $inicio; $i <= $fin; $i++)
+					{
+						if($i == $fin)
+						{
+							$valorAccesoTecMediante .= $aAccesoTec[$i];
+						}
+						else
+						{
+							$valorAccesoTecMediante .= $aAccesoTec[$i] . ";";	
+						}
+					}	
+				}				
+			}
+
+			if($randomico == 4)
+			{
+				$valorAccesoTecMediante = $aAccesoTec[0] . ";" . $aAccesoTec[1] . ";" . $aAccesoTec[2] ;
+			}			
+			
+		}
+		else
+		{
+			$accedioTec = 'no';				
+		}
+
+		$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set accede_tecnologia = '" . $accedioTec . "', sector_incorpora_tecnologia = '" . $valorSectorTec . "', acceso_tecnologia_mediante = '" . $valorAccesoTecMediante . "'  where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;
 
 		query($sqlUpdate);
 		echo $sqlUpdate . "<br>";
