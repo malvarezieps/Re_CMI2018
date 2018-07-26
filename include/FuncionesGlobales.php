@@ -408,6 +408,21 @@ function GetHeaderDetalle($departamento, $codIndicador)
                             <th scope='col'>PROGRAMA / PRODUCTO</th>
                         </tr>";
     }
+
+     if($departamento == 'FP' && ($codIndicador == 46))
+    {        
+            $tHeader .= "<tr>
+                            <th scope='col'>INDICE</th>
+                            <th scope='col'>ZONA</th>
+                            <th scope='col'>MES</th>
+                            <th scope='col'>NOMBRE OEPS</th>
+                            <th scope='col'>RUC ORG</th>
+                            <th scope='col'>NUM SOCIOS</th>
+                            <th scope='col'>ACCEDIO A TECNOLOGIA</th>                            
+                            <th scope='col'>SECTOR AL CUAL SE INCORPORA LA TECNOLOGÍA</th>
+                            <th scope='col'>ACCESO A TECNOLOGÍA MEDIANTE</th>                            
+                        </tr>";
+    }
     $tHeader .= "</thead>";
 
     return $tHeader;
