@@ -1,7 +1,7 @@
 <?php 
 include ('../lib/dbconfig.php');
 
-FillTecnologiaData();
+FillSectorProductivoData();
 
 function FillVisitas()
 {
@@ -213,6 +213,72 @@ function FillTecnologiaData()
 		}
 
 		$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set accede_tecnologia = '" . $accedioTec . "', sector_incorpora_tecnologia = '" . $valorSectorTec . "', acceso_tecnologia_mediante = '" . $valorAccesoTecMediante . "'  where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;
+
+		query($sqlUpdate);
+		echo $sqlUpdate . "<br>";
+	}
+
+	echo "Deal all works!!<br>";
+}
+
+function FillSectorProductivoData()
+{
+	$sql = "select * from fp_asesoria_asistencia_cofinanciamiento where year(fecha_reporte) = 2018";
+	$res = query($sql);
+	$arraySectorPriorizado = array('sector 01', 'sector 02', 'sector 03', 'sector 04');
+		
+
+	while($fila = mysql_fetch_array($res))
+	{
+		$codLinea = $fila['cod_asesoria_asistencia_cofinanciamiento'];
+		$opcRand = mt_rand(1, 2);
+		$sqlUpdate = '';
+
+		$implementado = '';
+		$sectorProductivo = '';
+		$obtuvoRespuestaAfirmativa = '';
+		$fechaRespuestaAfirmativa = '';
+
+		
+		if($opcRand == 1)
+		{
+
+			$randomico = mt_rand(0, 3);
+			$sectorProductivo = $arraySectorPriorizado[$randomico];
+			$implementado = 'si';
+			$obtuvoRespuestaAfirmativa = 'si';
+			$anio = '2018';
+			$mesR = mt_rand(1, 12);
+			$diaR = 0;
+			if($mesR == 2)
+			{
+				$diaR = mt_rand(1, 28);	
+			}
+			else
+			{
+				$diaR = mt_rand(1, 30);				
+			}
+			$fechaRespuestaAfirmativa = $anio . "-" . $mesR . "-" . $diaR;
+					
+			
+		}
+		else
+		{
+			$sectorProductivo = 'no';
+			$implementado = 'no';
+			$obtuvoRespuestaAfirmativa = 'no';
+			$fechaRespuestaAfirmativa = 0;
+		}
+
+		if($fechaRespuestaAfirmativa == 0)
+		{
+			$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set sector_productivo_priorizado = '" . $sectorProductivo . "', plan_negocio_implementado = '" . $implementado . "', plan_negocio_respuesta_afirmativa = '" . $obtuvoRespuestaAfirmativa . "', plan_negocio_fecha_respuesta = null  where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;			
+		}
+		else
+		{
+			$sqlUpdate = "update fp_asesoria_asistencia_cofinanciamiento set sector_productivo_priorizado = '" . $sectorProductivo . "', plan_negocio_implementado = '" . $implementado . "', plan_negocio_respuesta_afirmativa = '" . $obtuvoRespuestaAfirmativa . "', plan_negocio_fecha_respuesta = '" . $fechaRespuestaAfirmativa . "'  where cod_asesoria_asistencia_cofinanciamiento = " . $codLinea;			
+		}
+
 
 		query($sqlUpdate);
 		echo $sqlUpdate . "<br>";
